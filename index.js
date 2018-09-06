@@ -4,8 +4,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const restService = express();
-const { WebhookClient, Payload } = require('dialogflow-fulfillment');
-const agent = new WebhookClient({ request, response });
 
 restService.use(
   bodyParser.urlencoded({
@@ -27,6 +25,7 @@ restService.post("/echo", function(req, res) {
     displayText: speech,
     source: "webhook-echo-sample"
   });
+});
 
 restService.post("/audio", function(req, res) {
   var speech = "";
