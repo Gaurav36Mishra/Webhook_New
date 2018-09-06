@@ -4,6 +4,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const restService = express();
+const { WebhookClient, Payload } = require('dialogflow-fulfillment');
+const agent = new WebhookClient({ request, response });
 
 restService.use(
   bodyParser.urlencoded({
@@ -14,17 +16,64 @@ restService.use(
 restService.use(bodyParser.json());
 
 restService.post("/echo", function(req, res) {
-  var speech =
-    req.body.result &&
-    req.body.result.parameters &&
-    req.body.result.parameters.echoText
-      ? req.body.result.parameters.echoText
-      : "Seems like some problem. Speak again.";
-  return res.json({
-    speech: speech,
-    displayText: speech,
-    source: "webhook-echo-sample"
+//   var speech =
+//     req.body.result &&
+//     req.body.result.parameters &&
+//     req.body.result.parameters.echoText
+//       ? req.body.result.parameters.echoText
+//       : "Seems like some problem. Speak again.";
+//   return res.json({
+//     speech: speech,
+//     displayText: speech,
+//     source: "webhook-echo-sample"
+//   });
+  
+agent.add(new Payload(agent.ACTIONS_ON_GOOGLE,   {
+    "expectUserResponse": true,
+    "richResponse": {
+      "items": [
+        {
+          "simpleResponse": {
+            "textToSpeech": "Choose a item"
+          }
+        }
+      ]
+    },
+    "systemIntent": {
+      "intent": "actions.intent.OPTION",
+      "data": {
+        "@type": "type.googleapis.com/google.actions.v2.OptionValueSpec",
+        "carouselSelect": {
+          "items": [
+            {
+              "optionInfo": {
+                "key": "first title"
+              },
+              "description": "first description",
+              "image": {
+                "url": "https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png",
+                "accessibilityText": "first alt"
+              },
+              "title": "first title"
+            },
+            {
+              "optionInfo": {
+                "key": "second"
+              },
+              "description": "second description",
+              "image": {
+                "url": "https://lh3.googleusercontent.com/Nu3a6F80WfixUqf_ec_vgXy_c0-0r4VLJRXjVFF_X_CIilEu8B9fT35qyTEj_PEsKw",
+                "accessibilityText": "second alt"
+              },
+              "title": "second title"
+            }
+          ]
+        }
+      }
+    }
   });
+);
+  
 });
 
 restService.post("/audio", function(req, res) {
